@@ -1,0 +1,42 @@
+调用企业付款到银行卡需要对某些信息进行RSA加密，下面为node加密实例（已经获取到微信的RSA 公钥，
+并且通过openssl rsa -RSAPublicKey_in -in E:\\web\\php\\public\\ceshi.txt -pubout -out E:\\web\\php\\public\\ceshi3.txt，
+把RSA公钥格式PKCS#1转成PKCS#8了，因为不转的话node好像不支持（好像支持，php不支持而已）使用公钥格式为PKCS#1的（微信默认返回的是公钥格式为PKCS#1的）
+）
+
+
+下面为ceshi3.txt内容
+
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4N+TmdKYFed2vSrjFZjU
+kAvBbhkMeUHJnc6Fzu6x9ONABGUzVXurWELQG/7Z8kF4peX16r7klAwEr5gr3iYt
+p3HhHM11KQo8KvFoF4yQmYmT7mrEh0NbAGoSRRK2T1E0s8LUoWk9yC4Jdp/A/Lvd
+DJ+zdonC7RQs11JurlsOXEHUEHbpASgb+L40S24lubJxYkOly/enQoExcJya3jGw
+exY3usbZWbQo8p1LIBjrl3noCVdNKMgt6Rv3l4fCi588GCCxIvrUhPqfyfU59G5k
+XAHu9de6Iz3qjSJ6pq9zoZC6o3jq8D/3izr1ItjOvIHUCp5X7uH6wAtO46Drsz5B
+mQIDAQAB
+-----END PUBLIC KEY-----
+
+
+/*
+*     crypto.publicEncrypt方法可能是根据开头的-----BEGIN PUBLIC KEY-----使用对应的加密算法，然后要加密的内容到-----END PUBLIC KEY-----结束
+*     crypto.constants.RSA_PKCS1_OAEP_PADDING 为 加密之填充模式，可参考下面
+      
+      RSA算法使用说明（非对称加密算法，算法采用RSA/ECB/OAEPPadding模式）
+          1、 调用获取RSA公钥API获取RSA公钥，落地成本地文件，假设为public.pem
+          2、 确定public.pem文件的存放路径，同时修改代码中文件的输入路径，加载RSA公钥
+          3、 用标准的RSA加密库对敏感信息进行加密，选择RSA_PKCS1_OAEP_PADDING填充模式
+                （eg：Java的填充方式要选 " RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING"）
+*
+/
+
+
+const crypto = require('crypto');
+const fs = require('fs');
+
+fs.readFile('./ceshi3.txt',function(err,data){
+	 const buf4 = Buffer.from('hello world吴章本', 'utf8');
+	 console.log(buf4.toString('utf8'));
+	 console.log(crypto.publicEncrypt({ key: data.toString(), padding: crypto.constants.RSA_PKCS1_OAEP_PADDING },buf4).toString('base64').length);
+});
+
+

@@ -24,7 +24,14 @@ mQIDAQAB
 
 
 /*
-*     crypto.publicEncrypt方法可能是根据开头的-----BEGIN PUBLIC KEY-----使用对应的加密算法，然后要加密的内容到-----END PUBLIC KEY-----结束
+*     crypto.publicEncrypt方法和sign = crypto.createSign('SHA256');的区别
+
+      crypto.createSign 对应 key：<string> - PEM编码私钥（必需）
+      crypto.publicEncrypt  对应 key <string> PEM编码的公钥或私钥。
+      
+      公钥秘钥开头有PUBLIC字样   私钥秘钥开头有PRIVATE字样   所以我们使用是的公钥所以不能使用crypto.createSign
+  
+      -----BEGIN PUBLIC KEY-----加密的的公钥秘钥-----END PUBLIC KEY-----
 *     crypto.constants.RSA_PKCS1_OAEP_PADDING 为 加密之填充模式，可参考下面
       
       RSA算法使用说明（非对称加密算法，算法采用RSA/ECB/OAEPPadding模式）
